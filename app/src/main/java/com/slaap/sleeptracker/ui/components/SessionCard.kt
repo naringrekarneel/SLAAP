@@ -22,7 +22,6 @@ fun SessionCard(
     val startTime = TimeUtils.formatTime(session.startTime)
     val endTime = session.endTime?.let { TimeUtils.formatTime(it) } ?: "Now"
     val duration = if (session.endTime != null) TimeUtils.formatDuration(session.durationMinutes) else "In Progress"
-    val date = TimeUtils.formatDate(session.startTime)
 
     Column(
         modifier = modifier
@@ -31,14 +30,6 @@ fun SessionCard(
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(24.dp)
     ) {
-        Text(
-            text = date,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

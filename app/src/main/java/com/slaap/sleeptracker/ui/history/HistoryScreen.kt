@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.slaap.sleeptracker.ui.components.SessionCard
+import com.slaap.sleeptracker.util.TimeUtils
 
 @Composable
 fun HistoryScreen(
@@ -31,12 +32,24 @@ fun HistoryScreen(
             modifier = Modifier.padding(bottom = 24.dp, top = 16.dp)
         )
 
+        val groupedSessions = sessions.groupBy { TimeUtils.formatDate(it.startTime) }
+
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = 80.dp)
         ) {
-            items(sessions) { session ->
-                SessionCard(session = session)
+            groupedSessions.forEach { (date, dailySessions) ->
+                item {
+                    Text(
+                        text = date,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+                    )
+                }
+                items(dailySessions) { session ->
+                    SessionCard(session = session)
+                }
             }
         }
     }
