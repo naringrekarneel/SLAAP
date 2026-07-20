@@ -15,6 +15,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.slaap.sleeptracker.util.TimeUtils
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun StatsScreen(
@@ -66,6 +73,19 @@ fun StatsScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
+            Spacer(modifier = Modifier.height(32.dp))
+            Text(
+                text = "Last 7 Days (Hours)",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            HistogramChart(
+                data = s.last7Days,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
         } ?: run {
             Text(
                 text = "Not enough data.",
@@ -100,5 +120,28 @@ fun StatBox(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+fun HistogramChart(data: List<Float>, modifier: Modifier = Modifier) {
+    val barColor = MaterialTheme.colorScheme.primary
+    val maxVal = data.maxOrNull()?.coerceAtLeast(1f) ?: 1f
+
+    Canvas(modifier = modifier) {
+        val barWidth = size.width / (data.size * 2f)
+        val spaceWidth = barWidth
+        
+        data.forEachIndexed { index, value ->
+            val barHeight = (value / maxVal) * size.height
+            val startOffset = index * (barWidth + spaceWidth) + spaceWidth / 2f
+            
+            drawRoundRect(
+                color = barColor,
+                topLeft = Offset(startOffset, size.height - barHeight),
+                size = Size(barWidth, barHeight),
+                cornerRadius = CornerRadius(16f, 16f)
+            )
+        }
     }
 }
