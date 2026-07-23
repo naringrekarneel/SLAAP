@@ -80,7 +80,7 @@ fun StatsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { /* TODO: Previous Month */ },
+                    onClick = { viewModel.previousMonth() },
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -93,13 +93,13 @@ fun StatsScreen(
                 }
                 
                 Text(
-                    text = "July 2026", // Mockup date
+                    text = stats?.currentMonthLabel ?: "Loading...",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 
                 IconButton(
-                    onClick = { /* TODO: Next Month */ },
+                    onClick = { viewModel.nextMonth() },
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -136,8 +136,8 @@ fun StatsScreen(
                     
                     Spacer(modifier = Modifier.height(24.dp))
                     
-                    HistogramChart(
-                        data = s.distributionBuckets,
+                    MonthlyBarChart(
+                        data = s.dailyHours,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(180.dp)
@@ -206,18 +206,21 @@ fun StatsScreen(
 }
 
 @Composable
-fun HistogramChart(data: List<Int>, modifier: Modifier = Modifier) {
+fun MonthlyBarChart(data: List<Float>, modifier: Modifier = Modifier) {
+    if (data.isEmpty()) return
+
     val gradient = Brush.linearGradient(
         colors = listOf(
             Color(0xFFB15EFF), // Purple
             Color(0xFF5E8AFF)  // Blue
         )
     )
-    val maxVal = data.maxOrNull()?.coerceAtLeast(1) ?: 1
-    // Generate y-axis labels based on max value (e.g., 0 to maxVal)
-    val yLabels = (0..maxVal).toList()
-    val xLabels = listOf("4", "5", "6", "7", "8", "9", "10+")
-
+    val maxVal = data.maxOrNull()?.coerceAtLeast(1f) ?: 1f
+    
+    // Create sensible y-axis labels
+    val step = if (maxVal > 10f) 5f else 2f
+    val yLabels = generateSequence(0f) { it + step }.takeWhile { it <= maxVal + step }.toList()
+    
     Canvas(modifier = modifier) {
         val yAxisWidth = 40.dp.toPx()
         val xAxisHeight = 30.dp.toPx()
@@ -236,9 +239,9 @@ fun HistogramChart(data: List<Int>, modifier: Modifier = Modifier) {
         }
         
         yLabels.forEach { y ->
-            val yPos = chartHeight - (y.toFloat() / maxVal) * chartHeight
+            val yPos = chartHeight - (y / (yLabels.lastOrNull() ?: 1f)) * chartHeight
             drawContext.canvas.nativeCanvas.drawText(
-                y.toString(),
+                y.toInt().toString(),
                 yAxisWidth - 20f,
                 yPos + 10f,
                 textPaint
@@ -252,39 +255,38 @@ fun HistogramChart(data: List<Int>, modifier: Modifier = Modifier) {
             )
         }
 
-        // Draw Bars
+        // Draw Bars and X-Axis labels
+        val xTextPaint = Paint().apply {
+            color = android.graphics.Color.GRAY
+            textSize = 24f
+            textAlign = Paint.Align.CENTER
+        }
+
         data.forEachIndexed { index, value ->
-            val barHeight = (value.toFloat() / maxVal) * chartHeight
+            val day = index + 1
+            val yMax = yLabels.lastOrNull() ?: 1f
+            val barHeight = (value / yMax) * chartHeight
             val startOffset = yAxisWidth + index * (barWidth + spaceWidth) + spaceWidth / 2f
             val topOffset = chartHeight - barHeight
 
             if (barHeight > 0) {
-                // Glow effect
-                drawRoundRect(
-                    brush = gradient,
-                    topLeft = Offset(startOffset - 4f, topOffset - 4f),
-                    size = Size(barWidth + 8f, barHeight + 8f),
-                    cornerRadius = CornerRadius(16f, 16f),
-                    alpha = 0.2f
-                )
-                
-                // Actual bar
                 drawRoundRect(
                     brush = gradient,
                     topLeft = Offset(startOffset, topOffset),
                     size = Size(barWidth, barHeight),
-                    cornerRadius = CornerRadius(12f, 12f)
+                    cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
                 )
             }
-
-            // X Axis Label
-            textPaint.textAlign = Paint.Align.CENTER
-            drawContext.canvas.nativeCanvas.drawText(
-                xLabels[index],
-                startOffset + barWidth / 2f,
-                size.height - 10f,
-                textPaint
-            )
+            
+            // Draw x-axis label every 5 days and the 1st
+            if (day == 1 || day % 5 == 0 || day == data.size) {
+                drawContext.canvas.nativeCanvas.drawText(
+                    day.toString(),
+                    startOffset + barWidth / 2f,
+                    chartHeight + 25f,
+                    xTextPaint
+                )
+            }
         }
     }
 }

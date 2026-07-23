@@ -4,19 +4,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.slaap.sleeptracker.repository.SleepRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import java.time.Instant
+import java.time.ZoneId
+import java.time.YearMonth
 import javax.inject.Inject
 
 data class SleepStats(
     val avgSleepMinutes: Long,
     val longestSleepMinutes: Long,
     val totalSessions: Int,
-    val distributionBuckets: List<Int>, // 4, 5, 6, 7, 8, 9, 10+
+    val dailyHours: List<Float>, // Hours for each day in the month
     val mostCommonString: String,
     val goalAdherencePercent: Int,
-    val consistencyString: String
+    val consistencyString: String,
+    val currentMonthLabel: String
 )
 
 @HiltViewModel
@@ -24,46 +30,54 @@ class StatsViewModel @Inject constructor(
     repository: SleepRepository
 ) : ViewModel() {
 
-    val stats = repository.allCompletedSessions.map { sessions ->
-        if (sessions.isEmpty()) return@map null
+    private val _selectedMonth = MutableStateFlow(YearMonth.now())
+
+    val stats = combine(repository.allCompletedSessions, _selectedMonth) { sessions, selectedMonth ->
+        // Filter sessions to the selected month
+        val sessionsInMonth = sessions.filter { 
+            val date = Instant.ofEpochMilli(it.startTime).atZone(ZoneId.systemDefault()).toLocalDate()
+            YearMonth.from(date) == selectedMonth
+        }
+
+        val daysInMonth = selectedMonth.lengthOfMonth()
+        val dailyHours = FloatArray(daysInMonth) { 0f }
         
-        val totalMinutes = sessions.sumOf { it.durationMinutes }
-        val avgMinutes = totalMinutes / sessions.size
-
-        // Buckets for 4, 5, 6, 7, 8, 9, 10+ hours
-        val buckets = IntArray(7) { 0 }
-        sessions.forEach { session ->
-            val hours = (session.durationMinutes / 60).toInt()
-            when {
-                hours <= 4 -> buckets[0]++
-                hours == 5 -> buckets[1]++
-                hours == 6 -> buckets[2]++
-                hours == 7 -> buckets[3]++
-                hours == 8 -> buckets[4]++
-                hours == 9 -> buckets[5]++
-                hours >= 10 -> buckets[6]++
-            }
+        sessionsInMonth.forEach { session ->
+            val date = Instant.ofEpochMilli(session.startTime).atZone(ZoneId.systemDefault()).toLocalDate()
+            val dayIndex = date.dayOfMonth - 1
+            dailyHours[dayIndex] += (session.durationMinutes / 60f)
         }
 
-        val maxBucketIndex = buckets.indexOfFirst { it == buckets.maxOrNull() }
-        val maxBucketLabel = when (maxBucketIndex) {
-            0 -> "<5"
-            6 -> "10+"
-            else -> "${maxBucketIndex + 4}-${maxBucketIndex + 5}"
-        }
-        val mostCommonString = "$maxBucketLabel Hours (${buckets.maxOrNull()} nights)"
+        val monthLabel = "${selectedMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${selectedMonth.year}"
 
-        val goalMetCount = sessions.count { it.durationMinutes >= 7 * 60 } // Assume 7 hrs is goal
-        val goalPercent = if (sessions.isNotEmpty()) (goalMetCount * 100) / sessions.size else 0
+        val totalMinutes = sessionsInMonth.sumOf { it.durationMinutes }
+        val avgMinutes = if (sessionsInMonth.isNotEmpty()) totalMinutes / sessionsInMonth.size else 0L
+        val longestSleep = if (sessionsInMonth.isNotEmpty()) sessionsInMonth.maxOf { it.durationMinutes } else 0L
+
+        // most common string: can use max sleep for this month as a replacement
+        val maxSleep = dailyHours.maxOrNull()?.takeIf { it > 0f }
+        val mostCommonString = if (maxSleep != null) String.format("%.1f Hours (Max)", maxSleep) else "N/A"
+
+        val goalMetCount = sessionsInMonth.count { it.durationMinutes >= 7 * 60 } // Assume 7 hrs is goal
+        val goalPercent = if (sessionsInMonth.isNotEmpty()) (goalMetCount * 100) / sessionsInMonth.size else 0
 
         SleepStats(
             avgSleepMinutes = avgMinutes,
-            longestSleepMinutes = sessions.maxOf { it.durationMinutes },
-            totalSessions = sessions.size,
-            distributionBuckets = buckets.toList(),
+            longestSleepMinutes = longestSleep,
+            totalSessions = sessionsInMonth.size,
+            dailyHours = dailyHours.toList(),
             mostCommonString = mostCommonString,
             goalAdherencePercent = goalPercent,
-            consistencyString = "6.5-7.5 hrs" // Placeholder for now
+            consistencyString = "6.5-7.5 hrs", // Placeholder
+            currentMonthLabel = monthLabel
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    fun nextMonth() {
+        _selectedMonth.update { it.plusMonths(1) }
+    }
+
+    fun previousMonth() {
+        _selectedMonth.update { it.minusMonths(1) }
+    }
 }
