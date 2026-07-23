@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,7 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import com.slaap.sleeptracker.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,9 +39,6 @@ fun SleepButton(
 
     val text = if (isActive) "Stop Sleep" else "Start Sleep"
     val subtext = if (isActive) "Tap to wake up" else "Tap to begin"
-    
-    // Using default Icons since we don't have custom drawable resources
-    val icon = if (isActive) Icons.Filled.Warning else Icons.Outlined.Star
 
     Box(
         contentAlignment = Alignment.Center,
@@ -78,12 +74,21 @@ fun SleepButton(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = gradientColors[0],
-                modifier = Modifier.size(48.dp)
-            )
+            if (isActive) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = gradientColors[0],
+                    modifier = Modifier.size(64.dp)
+                )
+            } else {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_custom_moon),
+                    contentDescription = null,
+                    tint = gradientColors[0],
+                    modifier = Modifier.size(64.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = text,
