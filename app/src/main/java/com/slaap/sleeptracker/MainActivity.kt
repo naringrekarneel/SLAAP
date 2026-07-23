@@ -22,6 +22,15 @@ import androidx.navigation.compose.rememberNavController
 import android.Manifest
 import android.os.Build
 import androidx.core.app.ActivityCompat
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import com.slaap.sleeptracker.ui.history.HistoryScreen
 import com.slaap.sleeptracker.ui.home.HomeScreen
 import com.slaap.sleeptracker.ui.settings.SettingsScreen
@@ -69,38 +78,63 @@ fun MainScreen() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(Color(0xFF16181D))
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
-                
                 items.forEach { screen ->
-                    NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = screen.title) },
-                        label = { Text(screen.title) },
-                        selected = currentRoute == screen.route,
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.primary,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            indicatorColor = MaterialTheme.colorScheme.surfaceVariant,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                    val isSelected = currentRoute == screen.route
+                    val color = if (isSelected) Color(0xFFB15EFF) else Color(0xFF8B8D98)
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
-                        }
-                    )
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = screen.icon,
+                            contentDescription = screen.title,
+                            tint = color,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = screen.title,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = color
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        // The purple indicator line
+                        Box(
+                            modifier = Modifier
+                                .width(20.dp)
+                                .height(2.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(if (isSelected) color else Color.Transparent)
+                        )
+                    }
                 }
             }
-        }
+        },
+        containerColor = Color(0xFF0F1014)
     ) { innerPadding ->
         NavHost(
             navController = navController,
