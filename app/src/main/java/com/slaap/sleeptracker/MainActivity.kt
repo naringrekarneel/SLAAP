@@ -37,6 +37,7 @@ import com.slaap.sleeptracker.ui.settings.SettingsScreen
 import com.slaap.sleeptracker.ui.stats.StatsScreen
 import com.slaap.sleeptracker.ui.theme.SLAAPTheme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.material.icons.filled.Refresh
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Home : Screen("home", "Home", Icons.Filled.Home)
-    object History : Screen("history", "History", Icons.Filled.List)
+    object History : Screen("history", "History", Icons.Filled.Refresh) // Use refresh as fallback for history icon
     object Stats : Screen("stats", "Stats", Icons.Filled.DateRange)
     object Settings : Screen("settings", "Settings", Icons.Filled.Settings)
 }
@@ -84,10 +85,9 @@ fun MainScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-                    .clip(RoundedCornerShape(32.dp))
-                    .background(Color(0xFF16181D))
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+                    .background(Color(0xFF14121A))
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
