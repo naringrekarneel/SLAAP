@@ -24,12 +24,12 @@ import android.Manifest
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.painterResource
 import com.slaap.sleeptracker.ui.history.HistoryScreen
 import com.slaap.sleeptracker.ui.home.HomeScreen
 import com.slaap.sleeptracker.ui.settings.SettingsScreen
@@ -59,10 +59,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
+sealed class Screen(val route: String, val title: String, val icon: ImageVector?, val iconRes: Int? = null) {
     object Home : Screen("home", "Home", Icons.Filled.Home)
-    object History : Screen("history", "History", Icons.Filled.Refresh) // Use refresh as fallback for history icon
-    object Stats : Screen("stats", "Stats", Icons.Filled.DateRange)
+    object History : Screen("history", "History", null, R.drawable.ic_nav_history)
+    object Stats : Screen("stats", "Stats", null, R.drawable.ic_nav_stats)
     object Settings : Screen("settings", "Settings", Icons.Filled.Settings)
 }
 
@@ -110,12 +110,21 @@ fun MainScreen() {
                             }
                             .padding(8.dp)
                     ) {
-                        Icon(
-                            imageVector = screen.icon,
-                            contentDescription = screen.title,
-                            tint = color,
-                            modifier = Modifier.size(28.dp)
-                        )
+                        if (screen.icon != null) {
+                            Icon(
+                                imageVector = screen.icon,
+                                contentDescription = screen.title,
+                                tint = color,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        } else if (screen.iconRes != null) {
+                            Icon(
+                                painter = painterResource(id = screen.iconRes),
+                                contentDescription = screen.title,
+                                tint = color,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         // The purple indicator line
                         Box(
