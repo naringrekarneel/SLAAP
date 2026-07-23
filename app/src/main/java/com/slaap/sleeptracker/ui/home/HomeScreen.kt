@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,7 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
+import com.slaap.sleeptracker.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,7 +66,7 @@ fun HomeScreen(
                         color = Color.White
                     )
                     Icon(
-                        imageVector = Icons.Default.Star, // Fallback icon
+                        painter = painterResource(id = R.drawable.ic_custom_moon),
                         contentDescription = null,
                         tint = Color(0xFFB15EFF),
                         modifier = Modifier.size(24.dp)
@@ -122,7 +123,7 @@ fun HomeScreen(
                     ) {
                         Row {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Outlined.Star, contentDescription = null, tint = Color(0xFFB15EFF), modifier = Modifier.size(20.dp))
+                                Icon(painterResource(id = R.drawable.ic_custom_moon), contentDescription = null, tint = Color(0xFFB15EFF), modifier = Modifier.size(20.dp))
                                 Canvas(modifier = Modifier.height(40.dp).width(2.dp).padding(vertical = 4.dp)) {
                                     drawLine(
                                         color = Color(0xFF5E8AFF),
