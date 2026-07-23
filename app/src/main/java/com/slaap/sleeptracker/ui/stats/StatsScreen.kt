@@ -9,8 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -86,7 +86,7 @@ fun StatsScreen(
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Previous Month",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -105,7 +105,7 @@ fun StatsScreen(
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.KeyboardArrowRight,
+                        imageVector = Icons.Default.ArrowForward,
                         contentDescription = "Next Month",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
