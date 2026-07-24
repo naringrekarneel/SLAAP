@@ -26,6 +26,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun startSleepIfNotActive() {
+        viewModelScope.launch {
+            if (repository.getActiveSession() == null) {
+                repository.toggleSleepSession()
+            }
+        }
+    }
+
     fun scheduleAlarm(hour: Int, minute: Int) {
         val now = LocalDateTime.now()
         var alarmTime = now.withHour(hour).withMinute(minute).withSecond(0).withNano(0)

@@ -217,7 +217,7 @@ fun HomeScreen(
             AlertDialog(
                 onDismissRequest = {
                     showAlarmDialog = false
-                    if (!isActive) viewModel.toggleSleep()
+                    viewModel.startSleepIfNotActive()
                 },
                 title = { Text("Set System Alarm?") },
                 text = { Text("Would you like to also set your phone's native alarm for this time?") },
@@ -230,9 +230,14 @@ fun HomeScreen(
                             putExtra(AlarmClock.EXTRA_MINUTES, minute)
                             putExtra(AlarmClock.EXTRA_SKIP_UI, true)
                         }
-                        context.startActivity(intent)
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            // ActivityNotFoundException or SecurityException
+                            e.printStackTrace()
+                        }
                         showAlarmDialog = false
-                        if (!isActive) viewModel.toggleSleep()
+                        viewModel.startSleepIfNotActive()
                     }) {
                         Text("Yes")
                     }
@@ -240,7 +245,7 @@ fun HomeScreen(
                 dismissButton = {
                     TextButton(onClick = {
                         showAlarmDialog = false
-                        if (!isActive) viewModel.toggleSleep()
+                        viewModel.startSleepIfNotActive()
                     }) {
                         Text("No")
                     }
