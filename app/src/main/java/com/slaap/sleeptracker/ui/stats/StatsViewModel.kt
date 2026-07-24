@@ -21,7 +21,7 @@ data class SleepStats(
     val dailyHours: List<Float>, // Hours for each day in the month
     val mostCommonString: String,
     val goalAdherencePercent: Int,
-    val consistencyString: String,
+    val daysOver7Hours: Int,
     val currentMonthLabel: String
 )
 
@@ -68,7 +68,7 @@ class StatsViewModel @Inject constructor(
             dailyHours = dailyHours.toList(),
             mostCommonString = mostCommonString,
             goalAdherencePercent = goalPercent,
-            consistencyString = "6.5-7.5 hrs", // Placeholder
+            daysOver7Hours = goalMetCount,
             currentMonthLabel = monthLabel
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)

@@ -212,10 +212,10 @@ fun StatsScreen(
                         iconPainter = painterResource(id = R.drawable.ic_target),
                         modifier = Modifier.weight(1f)
                     )
-                    // Consistency
+                    // Consistency -> Days Over 7 Hours
                     StatSquare(
-                        title = "Most Consistent",
-                        value = s.consistencyString,
+                        title = "Days > 7 hrs",
+                        value = s.daysOver7Hours.toString(),
                         iconPainter = androidx.compose.ui.graphics.vector.rememberVectorPainter(Icons.Default.Star),
                         modifier = Modifier.weight(1f)
                     )
