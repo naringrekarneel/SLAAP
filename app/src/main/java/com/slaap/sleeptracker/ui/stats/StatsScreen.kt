@@ -13,11 +13,16 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.border
+import com.slaap.sleeptracker.R
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -53,22 +58,50 @@ fun StatsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Sleep Insights",
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Profile",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                Column {
+                    Text(
+                        text = "Sleep Insights",
+                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "Notifications",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Understand your sleep. Improve your days.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, Color(0xFFB15EFF).copy(alpha = 0.3f), CircleShape)
+                            .background(MaterialTheme.colorScheme.surface),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Profile",
+                            tint = Color(0xFFB15EFF),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, Color(0xFFB15EFF).copy(alpha = 0.3f), CircleShape)
+                            .background(MaterialTheme.colorScheme.surface),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notifications",
+                            tint = Color(0xFFB15EFF),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
 
@@ -77,20 +110,22 @@ fun StatsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 8.dp, horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
                     onClick = { viewModel.previousMonth() },
                     modifier = Modifier
+                        .size(48.dp)
+                        .shadow(elevation = 4.dp, shape = CircleShape)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Previous Month",
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = Color(0xFFB15EFF)
                     )
                 }
                 
@@ -103,13 +138,15 @@ fun StatsScreen(
                 IconButton(
                     onClick = { viewModel.nextMonth() },
                     modifier = Modifier
+                        .size(48.dp)
+                        .shadow(elevation = 4.dp, shape = CircleShape)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowForward,
                         contentDescription = "Next Month",
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = Color(0xFFB15EFF)
                     )
                 }
             }
@@ -121,20 +158,44 @@ fun StatsScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .shadow(elevation = 4.dp, shape = RoundedCornerShape(24.dp))
                         .clip(RoundedCornerShape(24.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(20.dp)
                 ) {
-                    Text(
-                        text = "Your Sleep Distribution (Monthly)",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Text(
-                        text = "Most Common: ${s.mostCommonString}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column {
+                            Text(
+                                text = "Sleep Distribution (Monthly)",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Most Common: ${s.mostCommonString}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFB15EFF)
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFFB15EFF).copy(alpha = 0.1f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_trending_up),
+                                contentDescription = "Trending",
+                                tint = Color(0xFFB15EFF),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                     
                     Spacer(modifier = Modifier.height(24.dp))
                     
@@ -148,12 +209,20 @@ fun StatsScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    text = "Key Statistics",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
+                Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                    Text(
+                        text = "Key Statistics",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .width(28.dp)
+                            .height(2.dp)
+                            .background(Color(0xFFB15EFF), RoundedCornerShape(1.dp))
+                    )
+                }
 
                 // Key Statistics Row
                 Row(
@@ -164,18 +233,21 @@ fun StatsScreen(
                     StatSquare(
                         title = "Average Sleep",
                         value = "${String.format("%.1f", s.avgSleepMinutes / 60f)} hrs",
+                        iconPainter = painterResource(id = R.drawable.ic_moon),
                         modifier = Modifier.weight(1f)
                     )
                     // Goal Adherence
                     GoalAdherenceSquare(
                         percent = s.goalAdherencePercent,
-                        subtitle = "${(s.goalAdherencePercent * s.totalSessions) / 100}/${s.totalSessions} nights",
+                        subtitle = "of nights",
+                        iconPainter = painterResource(id = R.drawable.ic_target),
                         modifier = Modifier.weight(1f)
                     )
                     // Consistency
                     StatSquare(
                         title = "Most Consistent",
                         value = s.consistencyString,
+                        iconPainter = androidx.compose.ui.graphics.vector.rememberVectorPainter(Icons.Default.Star),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -296,42 +368,72 @@ fun MonthlyBarChart(data: List<Float>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StatSquare(title: String, value: String, modifier: Modifier = Modifier) {
+fun StatSquare(title: String, value: String, iconPainter: androidx.compose.ui.graphics.painter.Painter, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(12.dp)
-            .aspectRatio(1f),
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(vertical = 24.dp, horizontal = 12.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color(0xFFB15EFF).copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = iconPainter,
+                contentDescription = title,
+                tint = Color(0xFFB15EFF),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = value,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onBackground
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = Color(0xFFB15EFF)
         )
     }
 }
 
 @Composable
-fun GoalAdherenceSquare(percent: Int, subtitle: String, modifier: Modifier = Modifier) {
+fun GoalAdherenceSquare(percent: Int, subtitle: String, iconPainter: androidx.compose.ui.graphics.painter.Painter, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(12.dp)
-            .aspectRatio(1f),
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(vertical = 24.dp, horizontal = 12.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color(0xFFB15EFF).copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = iconPainter,
+                contentDescription = "Goal",
+                tint = Color(0xFFB15EFF),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Goal Adherence",
             style = MaterialTheme.typography.labelSmall,
@@ -339,30 +441,29 @@ fun GoalAdherenceSquare(percent: Int, subtitle: String, modifier: Modifier = Mod
             maxLines = 1
         )
         Spacer(modifier = Modifier.height(12.dp))
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(60.dp)) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(50.dp)) {
             CircularProgressIndicator(
                 progress = 1f,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
-                strokeWidth = 6.dp
+                color = Color(0xFFB15EFF).copy(alpha = 0.2f),
+                strokeWidth = 4.dp
             )
             CircularProgressIndicator(
                 progress = percent / 100f,
-                color = Color(0xFF5E8AFF), // Blue
-                strokeWidth = 6.dp,
+                color = Color(0xFFB15EFF),
+                strokeWidth = 4.dp,
                 strokeCap = StrokeCap.Round
             )
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "$percent%",
-                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Text(
+                text = "$percent%",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
