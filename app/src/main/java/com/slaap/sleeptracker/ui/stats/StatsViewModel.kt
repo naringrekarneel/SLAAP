@@ -35,7 +35,7 @@ class StatsViewModel @Inject constructor(
     val stats = combine(repository.allCompletedSessions, _selectedMonth) { sessions, selectedMonth ->
         // Filter sessions to the selected month
         val sessionsInMonth = sessions.filter { 
-            val date = Instant.ofEpochMilli(it.startTime).atZone(ZoneId.systemDefault()).toLocalDate()
+            val date = java.time.LocalDate.parse(it.date)
             YearMonth.from(date) == selectedMonth
         }
 
@@ -43,7 +43,7 @@ class StatsViewModel @Inject constructor(
         val dailyHours = FloatArray(daysInMonth) { 0f }
         
         sessionsInMonth.forEach { session ->
-            val date = Instant.ofEpochMilli(session.startTime).atZone(ZoneId.systemDefault()).toLocalDate()
+            val date = java.time.LocalDate.parse(session.date)
             val dayIndex = date.dayOfMonth - 1
             dailyHours[dayIndex] += (session.durationMinutes / 60f)
         }
