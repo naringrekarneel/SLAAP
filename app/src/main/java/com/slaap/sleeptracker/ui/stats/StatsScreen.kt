@@ -71,38 +71,7 @@ fun StatsScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .border(1.dp, Color(0xFFB15EFF).copy(alpha = 0.3f), CircleShape)
-                            .background(MaterialTheme.colorScheme.surface),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Profile",
-                            tint = Color(0xFFB15EFF),
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .border(1.dp, Color(0xFFB15EFF).copy(alpha = 0.3f), CircleShape)
-                            .background(MaterialTheme.colorScheme.surface),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications",
-                            tint = Color(0xFFB15EFF),
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
+
             }
 
             // Tabs
@@ -371,11 +340,11 @@ fun MonthlyBarChart(data: List<Float>, modifier: Modifier = Modifier) {
 fun StatSquare(title: String, value: String, iconPainter: androidx.compose.ui.graphics.painter.Painter, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
+            .height(180.dp)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .padding(vertical = 24.dp, horizontal = 12.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(vertical = 16.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -392,19 +361,21 @@ fun StatSquare(title: String, value: String, iconPainter: androidx.compose.ui.gr
                 modifier = Modifier.size(24.dp)
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color(0xFFB15EFF)
-        )
+        Spacer(modifier = Modifier.weight(1f))
+        Box(modifier = Modifier.height(60.dp), contentAlignment = Alignment.Center) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = Color(0xFFB15EFF)
+            )
+        }
     }
 }
 
@@ -412,11 +383,11 @@ fun StatSquare(title: String, value: String, iconPainter: androidx.compose.ui.gr
 fun GoalAdherenceSquare(percent: Int, subtitle: String, iconPainter: androidx.compose.ui.graphics.painter.Painter, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
+            .height(180.dp)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .padding(vertical = 24.dp, horizontal = 12.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(vertical = 16.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -433,37 +404,41 @@ fun GoalAdherenceSquare(percent: Int, subtitle: String, iconPainter: androidx.co
                 modifier = Modifier.size(24.dp)
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "Goal Adherence",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(50.dp)) {
-            CircularProgressIndicator(
-                progress = 1f,
-                color = Color(0xFFB15EFF).copy(alpha = 0.2f),
-                strokeWidth = 4.dp
-            )
-            CircularProgressIndicator(
-                progress = percent / 100f,
-                color = Color(0xFFB15EFF),
-                strokeWidth = 4.dp,
-                strokeCap = StrokeCap.Round
-            )
-            Text(
-                text = "$percent%",
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground
-            )
+        Spacer(modifier = Modifier.weight(1f))
+        Box(modifier = Modifier.height(60.dp), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(46.dp)) {
+                    CircularProgressIndicator(
+                        progress = 1f,
+                        color = Color(0xFFB15EFF).copy(alpha = 0.2f),
+                        strokeWidth = 4.dp
+                    )
+                    CircularProgressIndicator(
+                        progress = percent / 100f,
+                        color = Color(0xFFB15EFF),
+                        strokeWidth = 4.dp,
+                        strokeCap = StrokeCap.Round
+                    )
+                    Text(
+                        text = "$percent%",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
         }
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp)
-        )
     }
 }
