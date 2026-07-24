@@ -2,7 +2,9 @@ package com.slaap.sleeptracker.ui.stats
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -215,77 +217,96 @@ fun MonthlyBarChart(data: List<Float>, modifier: Modifier = Modifier) {
             Color(0xFF5E8AFF)  // Blue
         )
     )
-    val maxVal = data.maxOrNull()?.coerceAtLeast(1f) ?: 1f
+    // Coerce at least 10 hours so the y-axis is standardized
+    val maxVal = data.maxOrNull()?.coerceAtLeast(10f) ?: 10f
     
     // Create sensible y-axis labels
-    val step = if (maxVal > 10f) 5f else 2f
+    val step = if (maxVal > 15f) 5f else 2f
     val yLabels = generateSequence(0f) { it + step }.takeWhile { it <= maxVal + step }.toList()
+    val yMax = yLabels.lastOrNull() ?: 10f
     
-    Canvas(modifier = modifier) {
-        val yAxisWidth = 40.dp.toPx()
-        val xAxisHeight = 30.dp.toPx()
+    Row(modifier = modifier) {
+        val yAxisWidth = 40.dp
+        val xAxisHeight = 30.dp
         
-        val chartWidth = size.width - yAxisWidth
-        val chartHeight = size.height - xAxisHeight
-        
-        val barWidth = chartWidth / (data.size * 1.5f)
-        val spaceWidth = (chartWidth - (barWidth * data.size)) / data.size
-
-        // Draw Y Axis Labels and Lines
-        val textPaint = Paint().apply {
-            color = android.graphics.Color.GRAY
-            textSize = 30f
-            textAlign = Paint.Align.RIGHT
-        }
-        
-        yLabels.forEach { y ->
-            val yPos = chartHeight - (y / (yLabels.lastOrNull() ?: 1f)) * chartHeight
-            drawContext.canvas.nativeCanvas.drawText(
-                y.toInt().toString(),
-                yAxisWidth - 20f,
-                yPos + 10f,
-                textPaint
-            )
-            // Subtle grid line
-            drawLine(
-                color = Color.White.copy(alpha = 0.05f),
-                start = Offset(yAxisWidth, yPos),
-                end = Offset(size.width, yPos),
-                strokeWidth = 2f
-            )
-        }
-
-        // Draw Bars and X-Axis labels
-        val xTextPaint = Paint().apply {
-            color = android.graphics.Color.GRAY
-            textSize = 24f
-            textAlign = Paint.Align.CENTER
-        }
-
-        data.forEachIndexed { index, value ->
-            val day = index + 1
-            val yMax = yLabels.lastOrNull() ?: 1f
-            val barHeight = (value / yMax) * chartHeight
-            val startOffset = yAxisWidth + index * (barWidth + spaceWidth) + spaceWidth / 2f
-            val topOffset = chartHeight - barHeight
-
-            if (barHeight > 0) {
-                drawRoundRect(
-                    brush = gradient,
-                    topLeft = Offset(startOffset, topOffset),
-                    size = Size(barWidth, barHeight),
-                    cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
-                )
+        // Fixed Y-Axis Left Side
+        Canvas(modifier = Modifier.width(yAxisWidth).fillMaxHeight()) {
+            val chartHeight = size.height - xAxisHeight.toPx()
+            val textPaint = Paint().apply {
+                color = android.graphics.Color.GRAY
+                textSize = 30f
+                textAlign = Paint.Align.RIGHT
             }
             
-            // Draw x-axis label every 5 days and the 1st
-            if (day == 1 || day % 5 == 0 || day == data.size) {
+            yLabels.forEach { y ->
+                val yPos = chartHeight - (y / yMax) * chartHeight
                 drawContext.canvas.nativeCanvas.drawText(
-                    day.toString(),
-                    startOffset + barWidth / 2f,
-                    chartHeight + 25f,
-                    xTextPaint
+                    y.toInt().toString(),
+                    size.width - 15f,
+                    yPos + 10f,
+                    textPaint
                 )
+            }
+        }
+
+        // Scrollable Bar Area Right Side
+        val scrollState = rememberScrollState()
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .horizontalScroll(scrollState)
+        ) {
+            val barWidthDp = 16.dp
+            val spacingDp = 10.dp
+            val totalWidthDp = (barWidthDp + spacingDp) * data.size + spacingDp
+            
+            Canvas(modifier = Modifier.width(totalWidthDp).fillMaxHeight()) {
+                val chartHeight = size.height - xAxisHeight.toPx()
+                val barWidth = barWidthDp.toPx()
+                val spacing = spacingDp.toPx()
+
+                // Draw subtle horizontal grid lines across the entire scroll area
+                yLabels.forEach { y ->
+                    val yPos = chartHeight - (y / yMax) * chartHeight
+                    drawLine(
+                        color = Color.White.copy(alpha = 0.05f),
+                        start = Offset(0f, yPos),
+                        end = Offset(size.width, yPos),
+                        strokeWidth = 2f
+                    )
+                }
+
+                // Draw Bars and X-Axis labels
+                val xTextPaint = Paint().apply {
+                    color = android.graphics.Color.GRAY
+                    textSize = 24f
+                    textAlign = Paint.Align.CENTER
+                }
+
+                data.forEachIndexed { index, value ->
+                    val day = index + 1
+                    val barHeight = (value / yMax) * chartHeight
+                    val startOffset = spacing + index * (barWidth + spacing)
+                    val topOffset = chartHeight - barHeight
+
+                    if (barHeight > 0) {
+                        drawRoundRect(
+                            brush = gradient,
+                            topLeft = Offset(startOffset, topOffset),
+                            size = Size(barWidth, barHeight),
+                            cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
+                        )
+                    }
+                    
+                    // Draw x-axis label for EVERY day since we now scroll!
+                    drawContext.canvas.nativeCanvas.drawText(
+                        day.toString(),
+                        startOffset + barWidth / 2f,
+                        chartHeight + 35f,
+                        xTextPaint
+                    )
+                }
             }
         }
     }
