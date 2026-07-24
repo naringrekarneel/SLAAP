@@ -215,7 +215,10 @@ fun HomeScreen(
 
         if (showAlarmDialog && selectedAlarmTime != null) {
             AlertDialog(
-                onDismissRequest = { showAlarmDialog = false },
+                onDismissRequest = {
+                    showAlarmDialog = false
+                    if (!isActive) viewModel.toggleSleep()
+                },
                 title = { Text("Set System Alarm?") },
                 text = { Text("Would you like to also set your phone's native alarm for this time?") },
                 confirmButton = {
@@ -229,12 +232,16 @@ fun HomeScreen(
                         }
                         context.startActivity(intent)
                         showAlarmDialog = false
+                        if (!isActive) viewModel.toggleSleep()
                     }) {
                         Text("Yes")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showAlarmDialog = false }) {
+                    TextButton(onClick = {
+                        showAlarmDialog = false
+                        if (!isActive) viewModel.toggleSleep()
+                    }) {
                         Text("No")
                     }
                 }
