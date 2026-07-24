@@ -44,6 +44,8 @@ fun HomeScreen(
     val lastSession by viewModel.lastSession.collectAsState(initial = null)
 
     val isActive = activeSession != null
+    var showAlarmDialog by remember { mutableStateOf(false) }
+    var selectedAlarmTime by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
     Column(
         modifier = Modifier
@@ -186,13 +188,8 @@ fun HomeScreen(
                         context,
                         { _, hour, minute ->
                             viewModel.scheduleAlarm(hour, minute)
-                            val intent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
-                                putExtra(AlarmClock.EXTRA_MESSAGE, "SLAAP Wake Up")
-                                putExtra(AlarmClock.EXTRA_HOUR, hour)
-                                putExtra(AlarmClock.EXTRA_MINUTES, minute)
-                                putExtra(AlarmClock.EXTRA_SKIP_UI, true)
-                            }
-                            context.startActivity(intent)
+                            selectedAlarmTime = Pair(hour, minute)
+                            showAlarmDialog = true
                         },
                         currentTime.hour,
                         currentTime.minute,
@@ -209,6 +206,34 @@ fun HomeScreen(
                 Text("When to wake", color = Color.White, fontSize = 16.sp)
             }
             Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Go", tint = Color(0xFFB15EFF))
+        }
+
+        if (showAlarmDialog && selectedAlarmTime != null) {
+            AlertDialog(
+                onDismissRequest = { showAlarmDialog = false },
+                title = { Text("Set System Alarm?") },
+                text = { Text("Would you like to also set your phone's native alarm for this time?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val (hour, minute) = selectedAlarmTime!!
+                        val intent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
+                            putExtra(AlarmClock.EXTRA_MESSAGE, "SLAAP Wake Up")
+                            putExtra(AlarmClock.EXTRA_HOUR, hour)
+                            putExtra(AlarmClock.EXTRA_MINUTES, minute)
+                            putExtra(AlarmClock.EXTRA_SKIP_UI, true)
+                        }
+                        context.startActivity(intent)
+                        showAlarmDialog = false
+                    }) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showAlarmDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
         }
     }
 }
