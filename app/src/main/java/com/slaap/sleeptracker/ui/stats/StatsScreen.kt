@@ -186,24 +186,7 @@ fun StatsScreen(
             }
         }
 
-        // Floating Action Button
-        FloatingActionButton(
-            onClick = { /* TODO: Open manual log */ },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 96.dp, end = 24.dp),
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onBackground
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Log Sleep")
-                Text("Log Sleep", style = MaterialTheme.typography.labelLarge)
-            }
-        }
+
     }
 }
 
