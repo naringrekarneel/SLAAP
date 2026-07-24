@@ -11,6 +11,9 @@ interface SleepSessionDao {
     @Insert
     suspend fun insertSession(session: SleepSession)
 
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
+    suspend fun insertSessions(sessions: List<SleepSession>)
+
     @Update
     suspend fun updateSession(session: SleepSession)
 
@@ -28,4 +31,7 @@ interface SleepSessionDao {
 
     @Query("DELETE FROM sleep_sessions")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM sleep_sessions ORDER BY id ASC")
+    suspend fun getAllSessionsSync(): List<SleepSession>
 }

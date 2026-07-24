@@ -52,4 +52,12 @@ class SleepRepository @Inject constructor(
     suspend fun deleteAllData() {
         sleepSessionDao.deleteAll()
     }
+
+    suspend fun insertSessions(sessions: List<SleepSession>) {
+        sleepSessionDao.insertSessions(sessions)
+    }
+
+    suspend fun getAllSessionsSync(): List<SleepSession> {
+        return sleepSessionDao.getAllSessionsSync()
+    }
 }

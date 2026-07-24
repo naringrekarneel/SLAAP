@@ -13,11 +13,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json"),
+        onResult = { uri -> uri?.let { viewModel.exportData(context, it) } }
+    )
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri -> uri?.let { viewModel.importData(context, it) } }
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,9 +46,17 @@ fun SettingsScreen(
         )
 
         SettingItem(
-            title = "Export as CSV",
-            subtitle = "Save data to Downloads",
-            onClick = { /* Export Logic */ }
+            title = "Backup Data",
+            subtitle = "Save your sleep data to a JSON file",
+            onClick = { exportLauncher.launch("slaap_backup.json") }
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        SettingItem(
+            title = "Restore Data",
+            subtitle = "Import your sleep data from a JSON file",
+            onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) }
         )
         
         Spacer(modifier = Modifier.height(16.dp))
